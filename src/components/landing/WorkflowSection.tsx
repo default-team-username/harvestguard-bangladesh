@@ -1,9 +1,16 @@
 import { useLanguage } from "@/contexts/LanguageContext";
-import { ChevronRight } from "lucide-react";
 import workflowStep1 from "@/assets/workflow-step-1.jpg";
 import workflowStep2 from "@/assets/workflow-step-2.jpg";
 import workflowStep3 from "@/assets/workflow-step-3.jpg";
 import workflowStep4 from "@/assets/workflow-step-4.jpg";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 
 export const WorkflowSection = () => {
   const { language } = useLanguage();
@@ -51,38 +58,56 @@ export const WorkflowSection = () => {
             : "আপনার ফসল রক্ষার সহজ পদক্ষেপ"}
         </p>
 
-        <div className="space-y-12">
-          {steps.map((step, index) => (
-            <div
-              key={index}
-              className="group flex flex-col items-center gap-6 rounded-2xl bg-secondary p-6 shadow-lg transition-all hover:shadow-xl md:flex-row md:p-8"
-            >
-              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-primary text-2xl font-bold text-primary-foreground">
-                {index + 1}
-              </div>
+        <Carousel
+          opts={{
+            align: "start",
+            loop: true,
+          }}
+          plugins={[
+            Autoplay({
+              delay: 4000,
+            }),
+          ]}
+          className="mx-auto w-full max-w-5xl"
+        >
+          <CarouselContent>
+            {steps.map((step, index) => (
+              <CarouselItem key={index}>
+                <div className="p-4">
+                  <div className="flex flex-col items-center gap-6 rounded-2xl bg-secondary p-8 shadow-xl">
+                    <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-primary text-3xl font-bold text-primary-foreground shadow-lg">
+                      {index + 1}
+                    </div>
 
-              <div className="h-48 w-full overflow-hidden rounded-xl md:h-40 md:w-64">
-                <img
-                  src={step.image}
-                  alt={language === "en" ? step.titleEn : step.titleBn}
-                  className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                />
-              </div>
+                    <div className="h-64 w-full overflow-hidden rounded-xl shadow-lg md:h-80">
+                      <img
+                        src={step.image}
+                        alt={language === "en" ? step.titleEn : step.titleBn}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
 
-              <div className="flex-1 text-center md:text-left">
-                <h4 className="mb-2 text-2xl font-bold text-foreground">
-                  {language === "en" ? step.titleEn : step.titleBn}
-                </h4>
-                <p className="text-muted-foreground">
-                  {language === "en" ? step.descEn : step.descBn}
-                </p>
-              </div>
+                    <div className="text-center">
+                      <h4 className="mb-3 text-2xl font-bold text-foreground md:text-3xl">
+                        {language === "en" ? step.titleEn : step.titleBn}
+                      </h4>
+                      <p className="text-lg text-muted-foreground">
+                        {language === "en" ? step.descEn : step.descBn}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="left-4" />
+          <CarouselNext className="right-4" />
+        </Carousel>
 
-              {index < steps.length - 1 && (
-                <ChevronRight className="hidden h-8 w-8 flex-shrink-0 text-primary md:block" />
-              )}
-            </div>
-          ))}
+        <div className="mt-6 text-center text-sm text-muted-foreground">
+          {language === "en" 
+            ? "Auto-playing • Swipe or click arrows to navigate" 
+            : "স্বয়ংক্রিয় • নেভিগেট করতে সোয়াইপ করুন বা তীর ক্লিক করুন"}
         </div>
       </div>
     </section>
