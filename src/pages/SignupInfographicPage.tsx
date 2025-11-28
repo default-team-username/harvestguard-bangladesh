@@ -64,6 +64,8 @@ const districts = [
   "Dhaka", "Chittagong", "Rajshahi", "Khulna", "Barisal", "Sylhet", "Rangpur", "Mymensingh", "Comilla", "Narayanganj"
 ];
 
+const MOCK_SIGNUP_CREDENTIALS_KEY = 'mock_signup_credentials';
+
 const SignupInfographicPage = () => {
   const navigate = useNavigate();
   const { language } = useLanguage();
@@ -122,11 +124,21 @@ const SignupInfographicPage = () => {
   const isFirstStep = current === 0;
 
   const onSubmit = async (data: SignupFormValues) => {
-    // Mock registration success
     const loadingToastId = toast.loading(getTranslation('Registering...', 'নিবন্ধন হচ্ছে...'));
 
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 500));
+
+    // --- Mock Persistence Logic ---
+    const mockUserData = {
+      mobile: data.mobile,
+      password: data.password,
+      name: data.name,
+      district: data.district,
+      role: 'farmer', // Signed up users are farmers
+    };
+    localStorage.setItem(MOCK_SIGNUP_CREDENTIALS_KEY, JSON.stringify(mockUserData));
+    // --- End Mock Persistence Logic ---
 
     toast.success(getTranslation('Registration successful! You can now log in.', 'নিবন্ধন সফল! আপনি এখন লগইন করতে পারেন।'), { id: loadingToastId });
     navigate('/login');

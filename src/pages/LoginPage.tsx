@@ -18,6 +18,8 @@ const MOCK_PASSWORD = 'asdfgh';
 const MOCK_USER_NAME = 'Shekhor';
 const MOCK_DISTRICT = 'Dhaka';
 
+const MOCK_SIGNUP_CREDENTIALS_KEY = 'mock_signup_credentials';
+
 // --- Schema Definition ---
 const loginSchema = z.object({
   mobile: z.string().min(10, { message: "Mobile number must be at least 10 digits." }),
@@ -82,20 +84,49 @@ const LoginPage = () => {
     
     const loadingToastId = toast.loading(language === 'en' ? 'Signing In...' : 'সাইন ইন হচ্ছে...');
 
-    // --- Mock Login Logic ---
-    if (mobile === MOCK_MOBILE && password === MOCK_PASSWORD) {
-      const mockUser = {
+    let isAuthenticated = false;
+    let userDetails = null;
+
+    // 1. Check against dynamically registered mock user (from signup page)
+    const storedCredentialsString = localStorage.getItem(MOCK_SIGNUP_CREDENTIALS_KEY);
+    if (storedCredentialsString) {
+      try {
+        const storedCredentials = JSON.parse(storedCredentialsString);
+        if (mobile === storedCredentials.mobile && password === storedCredentials.password && role === storedCredentials.role) {
+          isAuthenticated = true;
+          userDetails = {
+            id: 'mock-user-id-dynamic',
+            email: `${mobile}@shekor.com`,
+            user_metadata: {
+              name: storedCredentials.name,
+              district: storedCredentials.district,
+              role: storedCredentials.role,
+            }
+          };
+        }
+      } catch (e) {
+        console.error("Failed to parse stored mock credentials:", e);
+      }
+    }
+
+    // 2. Fallback to hardcoded mock user if not authenticated yet
+    if (!isAuthenticated && mobile === MOCK_MOBILE && password === MOCK_PASSWORD) {
+      isAuthenticated = true;
+      userDetails = {
         id: 'mock-user-id-123',
-        email: `${mobile}@shekor.com`, // Updated mock email domain
+        email: `${mobile}@shekor.com`,
         user_metadata: {
           name: MOCK_USER_NAME,
           district: MOCK_DISTRICT,
-          role: role,
+          role: role, // Use the selected role for the hardcoded user
         }
       };
-      
+    }
+
+    // --- Mock Login Logic ---
+    if (isAuthenticated && userDetails) {
       toast.success(language === 'en' ? 'Login successful!' : 'লগইন সফল!', { id: loadingToastId });
-      mockLogin(mockUser);
+      mockLogin(userDetails);
       
     } else {
       toast.error(language === 'en' ? 'Authentication failed: Invalid credentials.' : 'প্রমাণীকরণ ব্যর্থ হয়েছে।', { id: loadingToastId });
@@ -277,7 +308,7 @@ const LoginPage = () => {
                 {getTranslation("This is a demo app.", "এটি একটি ডেমো অ্যাপ।")}
               </p>
               <p className="mt-1">
-                {getTranslation(`Use Mobile: ${MOCK_MOBILE} / Password: ${MOCK_PASSWORD}`, `ব্যবহার করুন: মোবাইল: ${MOCK_MOBILE} / পাসওয়ার্ড: ${MOCK_PASSWORD}`)}
+                {getTranslation(`Use Mobile: ${MOCK_MOBILE} / Password: ${MOCK_PASSWORD} or your recently signed up credentials.`, `ব্যবহার করুন: মোবাইল: ${MOCK_MOBILE} / পাসওয়ার্ড: ${MOCK_PASSWORD} অথবা আপনার সম্প্রতি সাইন আপ করা শংসাপত্র।`)}
               </p>
             </div>
           </CardContent>
