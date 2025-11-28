@@ -1,14 +1,13 @@
 import React from 'react';
 import { useSession } from '@/contexts/SessionContext';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Bell, Plus, Wheat, AlertTriangle, Ruler, LogOut } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 const FarmerDashboard = () => {
-  const { user, isLoading } = useSession();
+  const { user, isLoading, mockLogout } = useSession();
   const { language } = useLanguage();
 
   if (isLoading) {
@@ -19,8 +18,8 @@ const FarmerDashboard = () => {
   const userName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'Farmer';
   const userDistrict = user?.user_metadata?.district || 'Dhaka';
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
+  const handleLogout = () => {
+    mockLogout();
   };
 
   const getTranslation = (en: string, bn: string) => (language === 'en' ? en : bn);

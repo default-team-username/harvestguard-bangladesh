@@ -17,7 +17,7 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { supabase } from "@/integrations/supabase/client";
+// import { supabase } from "@/integrations/supabase/client"; // Removed Supabase import
 
 // --- Schema Definition ---
 const signupSchema = z.object({
@@ -122,41 +122,14 @@ const SignupInfographicPage = () => {
   const isFirstStep = current === 0;
 
   const onSubmit = async (data: SignupFormValues) => {
-    const { mobile, password, name, district, nid, farmSize } = data;
-    
-    // Supabase uses email/password. We map mobile number to a dummy email for demonstration.
-    const email = `${mobile}@harvestguard.com`; 
-
+    // Mock registration success
     const loadingToastId = toast.loading(getTranslation('Registering...', 'নিবন্ধন হচ্ছে...'));
 
-    try {
-      // We pass the name, role, NID, mobile, district, and farm_size in the user_metadata 
-      // to be picked up by the handle_new_farmer trigger (which we will assume exists or create later)
-      const { data: { user }, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name: name,
-            role: 'farmer', // Assuming all signups here are farmers
-            district: district,
-            nid: nid,
-            mobile: mobile,
-            farm_size: farmSize,
-          }
-        }
-      });
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 500));
 
-      if (error) throw error;
-      
-      toast.success(getTranslation('Registration successful! Please check your email to confirm.', 'নিবন্ধন সফল! নিশ্চিত করতে আপনার ইমেল চেক করুন।'), { id: loadingToastId });
-      navigate('/login');
-      
-    } catch (error) {
-      console.error(error);
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-      toast.error(getTranslation(`Registration failed: ${errorMessage}`, 'নিবন্ধন ব্যর্থ হয়েছে।'), { id: loadingToastId });
-    }
+    toast.success(getTranslation('Registration successful! You can now log in.', 'নিবন্ধন সফল! আপনি এখন লগইন করতে পারেন।'), { id: loadingToastId });
+    navigate('/login');
   };
 
   // --- Digital Farmer Score Card ---

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,6 +10,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sprout, Phone, Lock, Wheat, ShoppingCart, Briefcase, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import { useSession } from '@/contexts/SessionContext';
+
+// --- Mock Credentials ---
+const MOCK_MOBILE = '01312345678';
+const MOCK_PASSWORD = 'asdfgh';
+const MOCK_USER_NAME = 'Shekhor';
+const MOCK_DISTRICT = 'Dhaka';
 
 // --- Schema Definition ---
 const loginSchema = z.object({
@@ -54,6 +60,7 @@ const roles = [
 const LoginPage = () => {
   const navigate = useNavigate();
   const { language } = useLanguage();
+  const { mockLogin } = useSession();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -71,28 +78,27 @@ const LoginPage = () => {
   };
 
   const onSubmit = async (data: LoginFormValues) => {
-    const { mobile, password } = data;
+    const { mobile, password, role } = data;
     
-    // Supabase uses email/password. We map mobile number to a dummy email for demonstration.
-    const email = `${mobile}@harvestguard.com`; 
-
     const loadingToastId = toast.loading(language === 'en' ? 'Signing In...' : 'সাইন ইন হচ্ছে...');
 
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
+    // --- Mock Login Logic ---
+    if (mobile === MOCK_MOBILE && password === MOCK_PASSWORD) {
+      const mockUser = {
+        id: 'mock-user-id-123',
+        email: `${mobile}@harvestguard.com`,
+        user_metadata: {
+          name: MOCK_USER_NAME,
+          district: MOCK_DISTRICT,
+          role: role,
+        }
+      };
       
       toast.success(language === 'en' ? 'Login successful!' : 'লগইন সফল!', { id: loadingToastId });
-      // Redirection is handled by SessionContext
+      mockLogin(mockUser);
       
-    } catch (error) {
-      console.error(error);
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-      toast.error(language === 'en' ? `Authentication failed: ${errorMessage}` : 'প্রমাণীকরণ ব্যর্থ হয়েছে।', { id: loadingToastId });
+    } else {
+      toast.error(language === 'en' ? 'Authentication failed: Invalid credentials.' : 'প্রমাণীকরণ ব্যর্থ হয়েছে।', { id: loadingToastId });
     }
   };
 
@@ -202,6 +208,8 @@ const LoginPage = () => {
                     placeholder={getTranslation("01XXXXXXXXX", "০১৮XXXXXXXX")}
                     {...form.register('mobile')}
                     className="pl-10 bg-muted/50"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                   />
                 </div>
                 {form.formState.errors.mobile && (
@@ -269,7 +277,7 @@ const LoginPage = () => {
                 {getTranslation("This is a demo app.", "এটি একটি ডেমো অ্যাপ।")}
               </p>
               <p className="mt-1">
-                {getTranslation("Use any credentials to proceed (e.g., 01234567890 / password123)", "এগিয়ে যেতে যেকোনো তথ্য ব্যবহার করুন।")}
+                {getTranslation(`Use Mobile: ${MOCK_MOBILE} / Password: ${MOCK_PASSWORD}`, `ব্যবহার করুন: মোবাইল: ${MOCK_MOBILE} / পাসওয়ার্ড: ${MOCK_PASSWORD}`)}
               </p>
             </div>
           </CardContent>
