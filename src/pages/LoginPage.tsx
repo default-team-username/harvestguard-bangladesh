@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -54,8 +54,7 @@ const roles = [
 const LoginPage = () => {
   const navigate = useNavigate();
   const { language } = useLanguage();
-  // We keep isSigningUp state to control the button text, but the actual signup action is now a navigation.
-  const [isSigningUp, setIsSigningUp] = useState(false); 
+  // Removed isSigningUp state as it is no longer needed for navigation or form toggling.
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -73,14 +72,9 @@ const LoginPage = () => {
   };
 
   const onSubmit = async (data: LoginFormValues) => {
-    const { mobile, password, role } = data;
+    const { mobile, password } = data;
     
-    // If the user is currently viewing the signup form (which is now handled by navigation), 
-    // we should redirect them to the signup flow instead of processing login.
-    if (isSigningUp) {
-      navigate('/signup');
-      return;
-    }
+    // The form is now exclusively for Sign In. No conditional navigation needed here.
 
     // Supabase uses email/password. We map mobile number to a dummy email for demonstration.
     const email = `${mobile}@harvestguard.com`; 
@@ -106,17 +100,6 @@ const LoginPage = () => {
   };
 
   const getTranslation = (en: string, bn: string) => (language === 'en' ? en : bn);
-
-  // Function to handle the toggle button click
-  const handleToggleAuthMode = () => {
-    if (isSigningUp) {
-      // If currently showing 'Sign Up' button, switch back to 'Sign In' view
-      setIsSigningUp(false);
-    } else {
-      // If currently showing 'Sign In' button, navigate to the infographic page
-      navigate('/signup');
-    }
-  };
 
   // --- Component Structure based on CSS specs ---
   return (
@@ -268,14 +251,14 @@ const LoginPage = () => {
               </Button>
             </form>
 
-            {/* Sign Up / Sign In Toggle */}
+            {/* Sign Up Link (Now direct navigation) */}
             <div className="mt-8 text-center">
               <p className="text-sm text-muted-foreground">
                 {getTranslation("Don't have an account?", "অ্যাকাউন্ট নেই?")}
               </p>
               <Button 
                 variant="link" 
-                onClick={handleToggleAuthMode}
+                onClick={() => navigate('/signup')} // Direct navigation fix
                 className="h-auto p-0 text-primary hover:text-primary/80 text-sm font-semibold mt-1"
               >
                 {getTranslation("Sign Up", "সাইন আপ করুন")}
