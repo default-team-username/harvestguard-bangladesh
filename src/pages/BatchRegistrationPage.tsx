@@ -6,21 +6,23 @@ import { toast } from 'sonner';
 import { ArrowLeft, Wheat } from 'lucide-react';
 
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useBatch } from '@/contexts/BatchContext'; // Import useBatch
+import { useBatch } from '@/contexts/BatchContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
 import BatchRegistrationForm from '@/components/batch/BatchRegistrationForm.tsx';
 import PredictionResultCard from '@/components/batch/PredictionResultCard.tsx';
+import FirstBatchSuccessModal from '@/components/batch/FirstBatchSuccessModal';
 import { batchSchema, BatchFormValues, PredictionResult } from '@/data/batchData.ts';
 import { generateMockPrediction } from '@/utils/prediction.ts';
 
 const BatchRegistrationPage = () => {
   const navigate = useNavigate();
   const { language } = useLanguage();
-  const { addBatch } = useBatch(); // Use addBatch from context
+  const { addBatch, batches } = useBatch(); // Get batches here to check length
   const [prediction, setPrediction] = useState<PredictionResult | null>(null);
   const [submittedData, setSubmittedData] = useState<BatchFormValues | null>(null);
+  const [showFirstBatchModal, setShowFirstBatchModal] = useState(false);
 
   const formMethods = useForm<BatchFormValues>({
     resolver: zodResolver(batchSchema),
@@ -39,6 +41,9 @@ const BatchRegistrationPage = () => {
   const getTranslation = (en: string, bn: string) => (language === 'en' ? en : bn);
 
   const onSubmit = async (data: BatchFormValues) => {
+    // Check if this is the first batch BEFORE adding it
+    const isFirstBatch = batches.length === 0; 
+    
     const loadingToastId = toast.loading(getTranslation('Calculating risk prediction...', 'ঝুঁকি পূর্বাভাস গণনা করা হচ্ছে...'));
 
     // Mock API call
@@ -54,6 +59,15 @@ const BatchRegistrationPage = () => {
     setSubmittedData(data);
     
     toast.success(getTranslation('Prediction available!', 'পূর্বাভাস উপলব্ধ!'), { id: loadingToastId });
+
+    // If it was the first batch, show the celebratory modal
+    if (isFirstBatch) {
+      setShowFirstBatchModal(true);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowFirstBatchModal(false);
   };
 
   // --- Main Render ---
@@ -127,6 +141,12 @@ const BatchRegistrationPage = () => {
           )}
         </div>
       </div>
+      
+      {/* First Batch Success Modal */}
+      <FirstBatchSuccessModal 
+        isOpen={showFirstBatchModal} 
+        onClose={handleCloseModal} 
+      />
     </div>
   );
 };
