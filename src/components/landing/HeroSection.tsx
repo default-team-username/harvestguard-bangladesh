@@ -2,9 +2,11 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ChevronRight } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
+import { useNavigate } from "react-router-dom";
 
 export const HeroSection = () => {
   const { language } = useLanguage();
+  const navigate = useNavigate();
   
   const getTranslation = (en: string, bn: string) => (language === 'en' ? en : bn);
 
@@ -30,6 +32,7 @@ export const HeroSection = () => {
           <Button
             size="lg"
             variant="hero"
+            onClick={() => navigate('/signup')}
             className="min-w-[140px] text-lg font-bold"
           >
             {language === "en" ? "Join Now" : "যোগ দিন"}
