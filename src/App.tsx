@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SessionContextProvider } from "./contexts/SessionContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { BatchProvider } from "./contexts/BatchContext"; // Import BatchProvider
 import Landing from "./pages/Landing";
 import LoginPage from "./pages/LoginPage";
 import SignupInfographicPage from "./pages/SignupInfographicPage";
@@ -22,15 +23,17 @@ const App = () => (
       <BrowserRouter>
         <LanguageProvider>
           <SessionContextProvider>
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<SignupInfographicPage />} />
-              <Route path="/dashboard" element={<FarmerDashboard />} />
-              <Route path="/dashboard/new-batch" element={<BatchRegistrationPage />} /> {/* New Route */}
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <BatchProvider> {/* Wrap content with BatchProvider */}
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignupInfographicPage />} />
+                <Route path="/dashboard" element={<FarmerDashboard />} />
+                <Route path="/dashboard/new-batch" element={<BatchRegistrationPage />} /> {/* New Route */}
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BatchProvider>
           </SessionContextProvider>
         </LanguageProvider>
       </BrowserRouter>

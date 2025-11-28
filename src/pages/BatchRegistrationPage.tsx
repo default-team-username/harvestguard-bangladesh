@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { ArrowLeft, Wheat } from 'lucide-react';
 
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useBatch } from '@/contexts/BatchContext'; // Import useBatch
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -17,6 +18,7 @@ import { generateMockPrediction } from '@/utils/prediction.ts';
 const BatchRegistrationPage = () => {
   const navigate = useNavigate();
   const { language } = useLanguage();
+  const { addBatch } = useBatch(); // Use addBatch from context
   const [prediction, setPrediction] = useState<PredictionResult | null>(null);
   const [submittedData, setSubmittedData] = useState<BatchFormValues | null>(null);
 
@@ -43,6 +45,19 @@ const BatchRegistrationPage = () => {
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     const result = generateMockPrediction(data);
+    
+    // Save the batch and navigate (Requirement 3)
+    if (result) {
+      addBatch(data, result);
+      
+      toast.success(getTranslation('New batch successfully added!', 'নতুন ব্যাচ সফলভাবে যোগ হয়েছে!'), { id: loadingToastId });
+      
+      // Navigate back to dashboard after successful submission
+      navigate('/dashboard');
+      return;
+    }
+
+    // Fallback for showing result card (if flow changes)
     setPrediction(result);
     setSubmittedData(data);
     
@@ -73,10 +88,10 @@ const BatchRegistrationPage = () => {
           {/* Title Container */}
           <div className="flex flex-col">
             <h1 className="text-base font-semibold text-primary-foreground">
-              {getTranslation(prediction ? "Prediction Result" : "New Batch Registration", prediction ? "পূর্বাভাস ফলাফল" : "নতুন ব্যাচ নিবন্ধন")}
+              {getTranslation("New Batch Registration", "নতুন ব্যাচ নিবন্ধন")}
             </h1>
             <p className="text-sm font-normal text-green-200">
-              {getTranslation(prediction ? "Review AI analysis" : "Enter batch details", prediction ? "এআই বিশ্লেষণ পর্যালোচনা করুন" : "ব্যাচের বিবরণ লিখুন")}
+              {getTranslation("Enter batch details", "ব্যাচের বিবরণ লিখুন")}
             </p>
           </div>
         </div>
