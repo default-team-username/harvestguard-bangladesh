@@ -311,8 +311,8 @@ const SignupInfographicPage = () => {
     <div
       className="flex min-h-screen flex-col items-center"
       style={{
-        // Replicating the green gradient background
-        background: "linear-gradient(180deg, hsl(160 100% 37%) 0%, hsl(160 100% 23%) 100%)",
+        // Updated to use the primary color (130 45% 35%) for the gradient
+        background: "linear-gradient(180deg, hsl(130 45% 45%) 0%, hsl(130 45% 25%) 100%)",
       }}
     >
       {/* Header */}
