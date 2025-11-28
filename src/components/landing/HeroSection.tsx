@@ -5,6 +5,8 @@ import heroBg from "@/assets/hero-bg.jpg";
 
 export const HeroSection = () => {
   const { language } = useLanguage();
+  
+  const getTranslation = (en: string, bn: string) => (language === 'en' ? en : bn);
 
   const scrollToWorkflow = () => {
     document.getElementById("workflow")?.scrollIntoView({ behavior: "smooth" });
@@ -21,7 +23,7 @@ export const HeroSection = () => {
 
       <div className="container relative z-10 mx-auto flex min-h-[90vh] flex-col items-center justify-center px-4 py-20 text-center">
         <h2 className="mb-8 text-4xl font-bold text-primary-foreground drop-shadow-lg md:text-5xl lg:text-6xl">
-          {language === "en" ? "HarvestGuard" : "হারভেস্টগার্ড"}
+          {getTranslation("Shekor", "শেকড়")}
         </h2>
 
         <div className="mb-6 flex flex-col gap-4 sm:flex-row">
@@ -45,9 +47,10 @@ export const HeroSection = () => {
         </div>
 
         <p className="mb-12 max-w-2xl text-lg font-medium text-primary-foreground/95 drop-shadow md:text-xl">
-          {language === "en"
-            ? "HarvestGuard is here to protect a farmer's livelihood"
-            : "একজন কৃষকের জীবনকে নিরাপদ রাখতে হারভেস্টগার্ড আপনার পাশে।"}
+          {getTranslation(
+            "Shekor is here to protect a farmer's livelihood",
+            "একজন কৃষকের জীবনকে নিরাপদ রাখতে শেকড় আপনার পাশে।"
+          )}
         </p>
 
         <div className="animate-bounce">

@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 export const Header = () => {
   const { language, toggleLanguage } = useLanguage();
   const navigate = useNavigate();
+  
+  const getTranslation = (en: string, bn: string) => (language === 'en' ? en : bn);
 
   return (
     <header className="sticky top-0 z-50 bg-primary shadow-md">
@@ -13,7 +15,7 @@ export const Header = () => {
         <div className="flex items-center gap-2">
           <Sprout className="h-8 w-8 text-primary-foreground" />
           <h1 className="text-xl font-bold text-primary-foreground md:text-2xl">
-            HarvestGuard
+            {getTranslation("Shekor", "শেকড়")}
           </h1>
         </div>
 

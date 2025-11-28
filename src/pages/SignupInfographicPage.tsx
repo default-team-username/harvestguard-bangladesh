@@ -163,7 +163,7 @@ const SignupInfographicPage = () => {
             {getTranslation("Farmer Registration", "কৃষক নিবন্ধন")}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            {getTranslation("Enter your details to join HarvestGuard", "হারভেস্টগার্ডে যোগ দিতে আপনার বিবরণ লিখুন")}
+            {getTranslation("Enter your details to join Shekor", "শেকড়ে যোগ দিতে আপনার বিবরণ লিখুন")}
           </p>
         </div>
 
@@ -321,7 +321,7 @@ const SignupInfographicPage = () => {
           <div className="flex items-center gap-2">
             <Sprout className="h-8 w-8 text-white" />
             <h1 className="text-2xl font-bold text-white">
-              {getTranslation("HarvestGuard", "হারভেস্টগার্ড")}
+              {getTranslation("Shekor", "শেকড়")}
             </h1>
           </div>
           <p className="text-sm text-primary-foreground/80">

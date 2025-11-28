@@ -57,10 +57,10 @@ export const Footer = () => {
               {language === "en" ? "Website" : "ওয়েবসাইট"}
             </h4>
             <a
-              href="https://harvestguard.com"
+              href="https://shekorbangladesh.com"
               className="block text-accent transition-colors hover:underline"
             >
-              www.harvestguard.com
+              www.shekorbangladesh.com
             </a>
             <p className="mt-4 text-sm text-primary-foreground/60">
               {language === "en"
@@ -71,7 +71,7 @@ export const Footer = () => {
         </div>
 
         <div className="mt-8 border-t border-primary-foreground/20 pt-8 text-center text-sm text-primary-foreground/60">
-          <p>© 2025 HarvestGuard. {language === "en" ? "All rights reserved." : "সর্বস্বত্ব সংরক্ষিত।"}</p>
+          <p>© 2025 শেকড়. {language === "en" ? "All rights reserved." : "সর্বস্বত্ব সংরক্ষিত।"}</p>
         </div>
       </div>
     </footer>

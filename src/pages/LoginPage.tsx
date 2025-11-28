@@ -86,7 +86,7 @@ const LoginPage = () => {
     if (mobile === MOCK_MOBILE && password === MOCK_PASSWORD) {
       const mockUser = {
         id: 'mock-user-id-123',
-        email: `${mobile}@harvestguard.com`,
+        email: `${mobile}@shekor.com`, // Updated mock email domain
         user_metadata: {
           name: MOCK_USER_NAME,
           district: MOCK_DISTRICT,
@@ -120,7 +120,7 @@ const LoginPage = () => {
           <div className="flex items-center gap-2">
             <Sprout className="h-8 w-8 text-primary-foreground" />
             <h1 className="text-xl font-bold text-primary-foreground">
-              HarvestGuard
+              {getTranslation("Shekor", "শেকড়")}
             </h1>
           </div>
 
