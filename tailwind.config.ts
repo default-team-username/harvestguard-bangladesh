@@ -51,12 +51,25 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        harvest: {
-          green: "hsl(var(--harvest-green))",
-          light: "hsl(var(--harvest-light))",
-          yellow: "hsl(var(--harvest-yellow))",
-          dark: "hsl(var(--harvest-dark))",
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar))",
+          foreground: "hsl(var(--sidebar-foreground))",
+          primary: {
+            DEFAULT: "hsl(var(--sidebar-primary))",
+            foreground: "hsl(var(--sidebar-primary-foreground))",
+          },
+          accent: {
+            DEFAULT: "hsl(var(--sidebar-accent))",
+            foreground: "hsl(var(--sidebar-accent-foreground))",
+          },
+          border: "hsl(var(--sidebar-border))",
+          ring: "hsl(var(--sidebar-ring))",
         },
+        'chart-1': "hsl(var(--chart-1))",
+        'chart-2': "hsl(var(--chart-2))",
+        'chart-3': "hsl(var(--chart-3))",
+        'chart-4': "hsl(var(--chart-4))",
+        'chart-5': "hsl(var(--chart-5))",
       },
       borderRadius: {
         lg: "var(--radius)",
