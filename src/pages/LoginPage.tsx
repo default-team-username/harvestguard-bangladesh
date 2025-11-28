@@ -54,7 +54,6 @@ const roles = [
 const LoginPage = () => {
   const navigate = useNavigate();
   const { language } = useLanguage();
-  // Removed isSigningUp state as it is no longer needed for navigation or form toggling.
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -74,8 +73,6 @@ const LoginPage = () => {
   const onSubmit = async (data: LoginFormValues) => {
     const { mobile, password } = data;
     
-    // The form is now exclusively for Sign In. No conditional navigation needed here.
-
     // Supabase uses email/password. We map mobile number to a dummy email for demonstration.
     const email = `${mobile}@harvestguard.com`; 
 
@@ -251,14 +248,14 @@ const LoginPage = () => {
               </Button>
             </form>
 
-            {/* Sign Up Link (Now direct navigation) */}
+            {/* Sign Up Link (Now using proper button with onClick handler) */}
             <div className="mt-8 text-center">
               <p className="text-sm text-muted-foreground">
                 {getTranslation("Don't have an account?", "অ্যাকাউন্ট নেই?")}
               </p>
               <Button 
                 variant="link" 
-                onClick={() => navigate('/signup')} // Direct navigation fix
+                onClick={() => navigate('/signup')}
                 className="h-auto p-0 text-primary hover:text-primary/80 text-sm font-semibold mt-1"
               >
                 {getTranslation("Sign Up", "সাইন আপ করুন")}
