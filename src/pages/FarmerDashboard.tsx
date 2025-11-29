@@ -18,7 +18,7 @@ const FarmerDashboard = () => {
   const navigate = useNavigate();
   
   // State for animation (Requirement 2)
-  const [isLoaded, setIsLoaded] as React.useState(false);
+  const [isLoaded, setIsLoaded] = React.useState(false);
 
   React.useEffect(() => {
     // Trigger fade-in animation after component mounts
