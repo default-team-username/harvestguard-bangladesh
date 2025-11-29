@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from 'react';
+import { toast } from 'sonner';
 
 interface WeatherProps {
   weatherStatus: "good" | "bad";
@@ -20,11 +21,17 @@ const Alerts: React.FC<AlertsProps> = ({ weather, risk }) => {
   useEffect(() => {
     // 2. Weather Alerts
     if (weather.weatherStatus === "bad") {
-      // If weather is "bad", show a browser alert: "মৌসম খারাপ"
-      alert("মৌসম খারাপ");
+      // If weather is "bad", show a UI toast: "মৌসম খারাপ"
+      toast.warning("মৌসম খারাপ", {
+        description: "Weather status is bad. Take precautions.",
+        duration: 5000,
+      });
     } else if (weather.weatherStatus === "good") {
-      // If weather is "good", show a browser alert: "আগামীকাল বৃষ্টি হবে এবং আপনার আলু গুদামে আর্দ্রতা বেশি। এখনই ফ্যান চালু করুন।"
-      alert("আগামীকাল বৃষ্টি হবে এবং আপনার আলু গুদামে আর্দ্রতা বেশি। এখনই ফ্যান চালু করুন।");
+      // If weather is "good", show a UI toast: "আগামীকাল বৃষ্টি হবে এবং আপনার আলু গুদামে আর্দ্রতা বেশি। এখনই ফ্যান চালু করুন।"
+      toast.success("আগামীকাল বৃষ্টি হবে এবং আপনার আলু গুদামে আর্দ্রতা বেশি। এখনই ফ্যান চালু করুন।", {
+        description: "Good weather, but check storage conditions.",
+        duration: 7000,
+      });
     }
 
     // 3. Critical Risk Notification
@@ -34,7 +41,7 @@ const Alerts: React.FC<AlertsProps> = ({ weather, risk }) => {
     }
   }, [weather.weatherStatus, risk.riskLevel]);
 
-  // The component itself renders nothing visible, it only handles side effects (alerts/console logs)
+  // The component itself renders nothing visible, it only handles side effects (toasts/console logs)
   return null;
 };
 
