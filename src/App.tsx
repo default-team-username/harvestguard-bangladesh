@@ -14,7 +14,8 @@ import FarmerDashboard from "./pages/FarmerDashboard";
 import BatchRegistrationPage from "./pages/BatchRegistrationPage";
 import BatchDetailsPage from "./pages/BatchDetailsPage";
 import WeatherPage from "./pages/WeatherPage";
-import MapPage from "./pages/MapPage"; // Import new MapPage
+import MapPage from "./pages/MapPage";
+import VoicePage from "./pages/VoicePage"; // Import new VoicePage
 
 const queryClient = new QueryClient();
 
@@ -35,7 +36,8 @@ const App = () => (
                 <Route path="/dashboard/new-batch" element={<BatchRegistrationPage />} />
                 <Route path="/dashboard/batch/:id" element={<BatchDetailsPage />} />
                 <Route path="/dashboard/weather" element={<WeatherPage />} />
-                <Route path="/dashboard/map" element={<MapPage />} /> {/* New Map Route */}
+                <Route path="/dashboard/map" element={<MapPage />} />
+                <Route path="/dashboard/voice" element={<VoicePage />} /> {/* New Voice Route */}
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
