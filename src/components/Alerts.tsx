@@ -6,11 +6,13 @@ import { useBatch } from '@/contexts/BatchContext';
 import { useWeather } from '@/hooks/useWeather';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { generateSmartAlert } from '@/utils/gemini';
+import { useNotification } from '@/contexts/NotificationContext';
 
 const Alerts: React.FC = () => {
   const { batches } = useBatch();
   const { forecast, isLoading: isWeatherLoading } = useWeather();
   const { language } = useLanguage();
+  const { addNotification } = useNotification();
 
   useEffect(() => {
     // Conditions to generate an alert:
@@ -26,6 +28,9 @@ const Alerts: React.FC = () => {
           const alert = await generateSmartAlert(batches, tomorrowWeather, language);
 
           if (alert) {
+            // Add to notification center
+            addNotification(alert);
+
             // Display the toast based on the alert type from Gemini
             switch (alert.type) {
               case 'warning':
@@ -62,7 +67,7 @@ const Alerts: React.FC = () => {
       })();
     }
     // The dependency array ensures this effect runs only when the necessary data changes.
-  }, [batches, forecast, isWeatherLoading, language]);
+  }, [batches, forecast, isWeatherLoading, language, addNotification]);
 
   // The component itself renders nothing visible, it only handles the toast side effect.
   return null;

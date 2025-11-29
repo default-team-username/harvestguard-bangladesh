@@ -10,20 +10,20 @@ import { useBatch, StoredBatch } from '@/contexts/BatchContext';
 import { format } from 'date-fns';
 import { cropTypes } from '@/data/batchData';
 import BottomNavBar from '@/components/layout/BottomNavBar';
-import BadgeDisplay from '@/components/dashboard/BadgeDisplay'; // Import new component
-import Alerts from '@/components/Alerts'; // Import Alerts component
+import BadgeDisplay from '@/components/dashboard/BadgeDisplay';
+import Alerts from '@/components/Alerts';
+import { useNotification } from '@/contexts/NotificationContext';
 
 const FarmerDashboard = () => {
   const { user, isLoading, mockLogout } = useSession();
   const { language } = useLanguage();
-  const { batches } = useBatch(); // Use batches from context
+  const { batches } = useBatch();
   const navigate = useNavigate();
+  const { unreadCount } = useNotification();
   
-  // State for animation (Requirement 2)
   const [isLoaded, setIsLoaded] = React.useState(false);
 
   React.useEffect(() => {
-    // Trigger fade-in animation after component mounts
     setIsLoaded(true);
   }, []);
 
@@ -31,10 +31,9 @@ const FarmerDashboard = () => {
     return <div className="flex min-h-screen items-center justify-center">Loading...</div>;
   }
 
-  // Extract user metadata
   const userName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'Farmer';
   const userDistrict = user?.user_metadata?.district || 'Dhaka';
-  const totalScore = user?.user_metadata?.totalScore ?? 0; // Use actual score
+  const totalScore = user?.user_metadata?.totalScore ?? 0;
   
   const handleLogout = () => {
     mockLogout();
@@ -46,18 +45,13 @@ const FarmerDashboard = () => {
 
   const getTranslation = (en: string, bn: string) => (language === 'en' ? en : bn);
 
-  // Helper function to translate crop type key to display name
   const getCropDisplayValue = (key: string) => {
     const item = cropTypes.find(i => i.key === key);
     return item ? getTranslation(item.en, item.bn) : key;
   };
 
-  // Calculate stats
   const totalBatches = batches.length;
   const highRiskBatches = batches.filter(b => b.prediction.riskLevel === 'High').length;
-
-
-  // --- Dashboard Components ---
 
   const StatCard = ({ titleEn, titleBn, value, icon: Icon, className, isScoreCard = false }: { titleEn: string, titleBn: string, value: string | number, icon: React.ElementType, className?: string, isScoreCard?: boolean }) => (
     <Card className={cn("flex flex-col justify-between p-4 bg-white/10 border border-white/20 backdrop-blur-sm", className)}>
@@ -97,13 +91,12 @@ const FarmerDashboard = () => {
       riskTextBn = 'উচ্চ ঝুঁকি';
     }
 
-    // Get localized crop name
     const cropName = getCropDisplayValue(batch.data.cropType);
 
     return (
       <Card 
         className="p-4 shadow-md border-border/50 hover:bg-secondary/50 transition-colors cursor-pointer rounded-xl"
-        onClick={handleClick} // Added onClick handler
+        onClick={handleClick}
       >
         <CardContent className="p-0 flex justify-between items-center">
           <div className="flex items-center gap-3">
@@ -162,22 +155,16 @@ const FarmerDashboard = () => {
     );
   };
 
-
   return (
     <div className="min-h-screen bg-background">
-      {/* Alerts Component (Now fetches its own data) */}
       <Alerts />
       
-      {/* Main Container */}
-      <div className="flex flex-col items-center pb-20 md:pb-0"> {/* Added pb-20 for bottom nav bar clearance */}
+      <div className="flex flex-col items-center pb-20 md:pb-0">
         
-        {/* Top Header Section (Green Background) */}
         <div className="w-full bg-primary shadow-lg rounded-b-3xl p-4 pb-8">
           <div className="container mx-auto px-0">
             
-            {/* Top Bar: Welcome & Notification/Profile */}
             <div className="flex justify-between items-center h-12 mb-4">
-              {/* Welcome Text (Requirement 1) */}
               <div className="flex flex-col">
                 <h2 className="text-base font-normal text-white">
                   {language === 'en' ? `Welcome, ${userName}` : "শেকড়ে স্বাগতম!"}
@@ -187,14 +174,19 @@ const FarmerDashboard = () => {
                 </p>
               </div>
 
-              {/* Notification/Profile Icon */}
               <div className="flex items-center gap-3">
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="bg-white/20 hover:bg-white/30 text-white rounded-full"
+                  className="relative bg-white/20 hover:bg-white/30 text-white rounded-full"
+                  onClick={() => navigate('/dashboard/notifications')}
                 >
                   <Bell className="h-5 w-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-xs font-bold text-white ring-2 ring-primary">
+                      {unreadCount}
+                    </span>
+                  )}
                 </Button>
                 <Button 
                   onClick={handleLogout}
@@ -207,7 +199,6 @@ const FarmerDashboard = () => {
               </div>
             </div>
 
-            {/* Stats Cards */}
             <div className="grid grid-cols-3 gap-3">
               <StatCard 
                 titleEn="Total Batches" 
@@ -235,7 +226,6 @@ const FarmerDashboard = () => {
           </div>
         </div>
 
-        {/* Add New Batch Button Container (Requirement 2: Placement and Animation) */}
         <div className={cn(
           "container mx-auto px-4 w-full max-w-md z-10 transition-all duration-700 ease-out",
           isLoaded ? "opacity-100 translate-y-0 mt-6" : "opacity-0 translate-y-4 mt-6"
@@ -252,16 +242,11 @@ const FarmerDashboard = () => {
           </Button>
         </div>
 
-        {/* Main Content Area */}
         <div className="container mx-auto px-4 w-full max-w-md">
-          
-          {/* Batch List / Empty State Card (Requirement 3) */}
           <BatchList />
-
         </div>
       </div>
       
-      {/* Bottom Navigation Bar (Mobile Only) */}
       <BottomNavBar />
     </div>
   );
