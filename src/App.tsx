@@ -5,15 +5,16 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SessionContextProvider } from "./contexts/SessionContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
-import { BatchProvider } from "./contexts/BatchContext"; // Import BatchProvider
+import { BatchProvider } from "./contexts/BatchContext";
 import Landing from "./pages/Landing";
 import LoginPage from "./pages/LoginPage";
 import SignupInfographicPage from "./pages/SignupInfographicPage";
 import NotFound from "./pages/NotFound";
 import FarmerDashboard from "./pages/FarmerDashboard";
-import BatchRegistrationPage from "./pages/BatchRegistrationPage"; // Import new page
-import BatchDetailsPage from "./pages/BatchDetailsPage"; // Import new page
-import WeatherPage from "./pages/WeatherPage"; // Import new page
+import BatchRegistrationPage from "./pages/BatchRegistrationPage";
+import BatchDetailsPage from "./pages/BatchDetailsPage";
+import WeatherPage from "./pages/WeatherPage";
+import MapPage from "./pages/MapPage"; // Import new MapPage
 
 const queryClient = new QueryClient();
 
@@ -25,15 +26,16 @@ const App = () => (
       <BrowserRouter>
         <LanguageProvider>
           <SessionContextProvider>
-            <BatchProvider> {/* Wrap content with BatchProvider */}
+            <BatchProvider>
               <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupInfographicPage />} />
                 <Route path="/dashboard" element={<FarmerDashboard />} />
-                <Route path="/dashboard/new-batch" element={<BatchRegistrationPage />} /> {/* New Route */}
-                <Route path="/dashboard/batch/:id" element={<BatchDetailsPage />} /> {/* New Route for details */}
-                <Route path="/dashboard/weather" element={<WeatherPage />} /> {/* New Weather Route */}
+                <Route path="/dashboard/new-batch" element={<BatchRegistrationPage />} />
+                <Route path="/dashboard/batch/:id" element={<BatchDetailsPage />} />
+                <Route path="/dashboard/weather" element={<WeatherPage />} />
+                <Route path="/dashboard/map" element={<MapPage />} /> {/* New Map Route */}
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
