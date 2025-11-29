@@ -104,6 +104,19 @@ export const mockDb = {
     return newUser;
   },
 
+  updateUserScore: (mobile: string, newScore: number, newBadges: BadgeKey[]): UserProfile | null => {
+    const db = getDb();
+    const user = db.users[mobile];
+    if (user) {
+      user.user_metadata.totalScore = newScore;
+      user.user_metadata.earnedBadges = newBadges;
+      db.users[mobile] = user;
+      saveDb(db);
+      return user;
+    }
+    return null;
+  },
+
   // API Key Management
   getApiKey: (keyName: string): string | null => {
     const db = getDb();

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from './LanguageContext';
 import { toast } from 'sonner';
+import { mockDb } from '@/lib/mockDb';
 
 // --- New types and constants for scoring ---
 export type BadgeKey = 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Master';
@@ -119,6 +120,10 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
 
       localStorage.setItem(MOCK_SESSION_KEY, JSON.stringify(updatedSession));
       
+      // Save the updated score to the persistent mock database
+      const mobile = prevUser.email.split('@')[0];
+      mockDb.updateUserScore(mobile, newScore, newEarnedBadges);
+
       // Trigger popup if a new badge was earned
       if (newlyEarnedBadgeKey) {
         showMilestonePopup(newlyEarnedBadgeKey);
