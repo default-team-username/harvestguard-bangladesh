@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Sprout, Phone, Lock, Wheat, ShoppingCart, Briefcase, ArrowLeft } from 'lucide-react';
+import { Sprout, Phone, Lock, Wheat, Briefcase, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSession } from '@/contexts/SessionContext';
 
@@ -24,7 +24,7 @@ const MOCK_SIGNUP_CREDENTIALS_KEY = 'mock_signup_credentials';
 const loginSchema = z.object({
   mobile: z.string().min(10, { message: "Mobile number must be at least 10 digits." }),
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
-  role: z.enum(['farmer', 'buyer', 'executive'], {
+  role: z.enum(['farmer', 'executive'], { // Updated enum: removed 'buyer'
     errorMap: () => ({ message: "Please select a role." }),
   }),
 });
@@ -40,14 +40,6 @@ const roles = [
     titleBn: 'কৃষক',
     descEn: 'Cultivator',
     descBn: 'চাষী',
-  },
-  { 
-    key: 'buyer', 
-    icon: ShoppingCart, 
-    titleEn: 'Buyer', 
-    titleBn: 'ক্রেতা',
-    descEn: 'Purchaser',
-    descBn: 'ক্রেতা',
   },
   { 
     key: 'executive', 
@@ -202,7 +194,7 @@ const LoginPage = () => {
                       type="button"
                       onClick={() => handleRoleSelect(role.key as LoginFormValues['role'])}
                       className={
-                        'flex flex-col items-center justify-center p-4 w-1/3 rounded-xl transition-all duration-200 ' +
+                        'flex flex-col items-center justify-center p-4 w-1/2 rounded-xl transition-all duration-200 ' +
                         (selectedRole === role.key
                           ? 'bg-primary text-primary-foreground shadow-lg border-2 border-primary'
                           : 'bg-background text-foreground border border-border hover:bg-secondary/50')
