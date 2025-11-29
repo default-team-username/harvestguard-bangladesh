@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle, AlertTriangle, XCircle, Gauge } from 'lucide-react';
+import { CheckCircle, AlertTriangle, XCircle, Gauge, Shield } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -44,10 +44,6 @@ const QualityResultDisplay: React.FC<QualityResultDisplayProps> = ({ result, cro
   
   const isFresh = result.status === 'Fresh';
 
-  // New descriptive text
-  const aiDescriptionEn = "AI instantly identifies the threat, assesses the risk, and generates a hyper-local, grounded, and specific treatment plan entirely in Bangla.";
-  const aiDescriptionBn = "এআই তাৎক্ষণিকভাবে হুমকি শনাক্ত করে, ঝুঁকি মূল্যায়ন করে এবং সম্পূর্ণ বাংলায় একটি হাইপার-লোকাল, বাস্তবসম্মত ও নির্দিষ্ট প্রতিকার পরিকল্পনা তৈরি করে।";
-
   return (
     <div className="w-full space-y-6">
       {/* --- 1. Quality Result Card --- */}
@@ -82,13 +78,6 @@ const QualityResultDisplay: React.FC<QualityResultDisplayProps> = ({ result, cro
             <span className={cn("font-bold", iconColorClass)}>{result.confidence}%</span>
           </div>
 
-          {/* AI Description Block */}
-          <div className="mt-6 w-full p-3 bg-secondary rounded-xl text-center border border-border/50">
-            <p className="text-sm font-medium text-foreground">
-              {getTranslation(aiDescriptionEn, aiDescriptionBn)}
-            </p>
-          </div>
-
           {/* Guidance Box */}
           <div className="mt-8 w-full p-4 bg-white border border-green-200 rounded-xl text-left">
             <p className="text-base font-semibold text-gray-700">
@@ -100,6 +89,40 @@ const QualityResultDisplay: React.FC<QualityResultDisplayProps> = ({ result, cro
           </div>
         </CardContent>
       </Card>
+
+      {/* --- 2. Treatment Plan Card (Only shown for threats) --- */}
+      {result.treatmentPlanEn && result.treatmentPlanBn && (
+        <Card className="w-full p-6 shadow-lg border-border/50 bg-blue-50 border-blue-200">
+          <CardContent className="p-0">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+                <Shield className="h-5 w-5 text-blue-700" />
+              </div>
+              <div className="flex flex-col">
+                <h3 className="text-lg font-bold text-blue-800">
+                  {getTranslation("Hyperlocal Treatment Plan", "হাইপারলোকাল চিকিৎসা পরিকল্পনা")}
+                </h3>
+                <p className="text-xs text-blue-600">
+                  {getTranslation("Specific actions for your location", "আপনার অবস্থানের জন্য নির্দিষ্ট কাজ")}
+                </p>
+              </div>
+            </div>
+            
+            <div className="bg-white p-4 rounded-lg border border-blue-100">
+              <pre className="whitespace-pre-wrap text-sm text-foreground font-sans">
+                {getTranslation(result.treatmentPlanEn, result.treatmentPlanBn)}
+              </pre>
+            </div>
+            
+            <p className="text-xs text-muted-foreground mt-3">
+              {getTranslation(
+                "This plan is generated based on your location, crop type, and current weather conditions.",
+                "এই পরিকল্পনা আপনার অবস্থান, ফসলের ধরন এবং বর্তমান আবহাওয়ার উপর ভিত্তি করে তৈরি করা হয়েছে।"
+              )}
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Back Button */}
       <Button 
