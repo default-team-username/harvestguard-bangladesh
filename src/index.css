@@ -98,9 +98,3 @@ All colors MUST be HSL.
     font-family: 'Inter', 'Noto Sans Bengali', system-ui, sans-serif;
   }
 }
-
-/* Custom styles for Leaflet icons to remove default background/border */
-.custom-leaflet-icon, .custom-leaflet-user-icon {
-  background: transparent;
-  border: none;
-}
