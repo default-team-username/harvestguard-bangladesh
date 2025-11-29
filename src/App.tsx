@@ -13,6 +13,7 @@ import NotFound from "./pages/NotFound";
 import FarmerDashboard from "./pages/FarmerDashboard";
 import BatchRegistrationPage from "./pages/BatchRegistrationPage"; // Import new page
 import BatchDetailsPage from "./pages/BatchDetailsPage"; // Import new page
+import WeatherPage from "./pages/WeatherPage"; // Import new page
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
                 <Route path="/dashboard" element={<FarmerDashboard />} />
                 <Route path="/dashboard/new-batch" element={<BatchRegistrationPage />} /> {/* New Route */}
                 <Route path="/dashboard/batch/:id" element={<BatchDetailsPage />} /> {/* New Route for details */}
+                <Route path="/dashboard/weather" element={<WeatherPage />} /> {/* New Weather Route */}
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
