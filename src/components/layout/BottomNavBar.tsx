@@ -16,7 +16,7 @@ const navItems: NavItem[] = [
   { path: '/dashboard', icon: Home, labelEn: 'Home', labelBn: 'ড্যাশবোর্ড' },
   { path: '/dashboard/weather', icon: Cloud, labelEn: 'Weather', labelBn: 'আবহাওয়া' },
   { path: '/dashboard/map', icon: Map, labelEn: 'Map', labelBn: 'মানচিত্র' },
-  { path: '/dashboard/camera', icon: Camera, labelEn: 'Camera', labelBn: 'ক্যামেরা' },
+  { path: '/dashboard/quality-scan', icon: Camera, labelEn: 'Camera', labelBn: 'ক্যামেরা' },
   { path: '/dashboard/voice', icon: Mic, labelEn: 'Voice', labelBn: 'ভয়েস' },
 ];
 
