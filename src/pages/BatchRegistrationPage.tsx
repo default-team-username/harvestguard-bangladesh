@@ -8,6 +8,7 @@ import { ArrowLeft, Wheat } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBatch } from '@/contexts/BatchContext';
 import { useSession } from '@/contexts/SessionContext';
+import { useWeather } from '@/hooks/useWeather';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -16,20 +17,19 @@ import PredictionResultCard from '@/components/batch/PredictionResultCard.tsx';
 import FirstBatchSuccessModal from '@/components/batch/FirstBatchSuccessModal';
 import { batchSchema, BatchFormValues, PredictionResult } from '@/data/batchData.ts';
 import { generateMockPrediction } from '@/utils/prediction.ts';
-import { getMockEnvironmentDefaults } from '@/utils/mockEnvironment';
 
 const BatchRegistrationPage = () => {
   const navigate = useNavigate();
   const { language } = useLanguage();
   const { addBatch, batches } = useBatch();
-  const { user } = useSession(); // Get user session
+  const { user } = useSession();
+  const { forecast } = useWeather(); // Use weather hook
   
   const [prediction, setPrediction] = useState<PredictionResult | null>(null);
   const [submittedData, setSubmittedData] = useState<BatchFormValues | null>(null);
   const [showFirstBatchModal, setShowFirstBatchModal] = useState(false);
 
   const userDistrict = user?.user_metadata?.district || 'Dhaka';
-  const environmentDefaults = getMockEnvironmentDefaults(userDistrict);
 
   const formMethods = useForm<BatchFormValues>({
     resolver: zodResolver(batchSchema),
@@ -37,16 +37,38 @@ const BatchRegistrationPage = () => {
       cropType: '',
       estimatedWeight: 0,
       harvestDate: undefined,
-      // Use user's location and mock environment data for defaults (Requirement 1)
+      // Use user's location for default
       storageLocation: userDistrict, 
       storageMethod: '',
-      storageTemperature: environmentDefaults.storageTemperature,
-      moistureLevel: environmentDefaults.moistureLevel,
+      // Set initial defaults to 0 or a placeholder until weather loads
+      storageTemperature: 0,
+      moistureLevel: 0,
     },
     mode: 'onChange',
   });
+  
+  const { setValue } = formMethods;
 
   const getTranslation = (en: string, bn: string) => (language === 'en' ? en : bn);
+
+  // Effect to set temperature and moisture once weather data is available
+  React.useEffect(() => {
+    if (forecast.length > 0) {
+      const todayForecast = forecast[0];
+      
+      // Use max temperature for storage temperature default
+      setValue('storageTemperature', todayForecast.tempMax, { shouldValidate: true });
+      
+      // Use humidity for moisture level default
+      setValue('moistureLevel', todayForecast.humidity, { shouldValidate: true });
+      
+      // Show a toast notification that values were autofilled
+      toast.info(getTranslation(
+        `Storage conditions autofilled based on ${userDistrict} weather.`, 
+        `${userDistrict} আবহাওয়ার উপর ভিত্তি করে সংরক্ষণের শর্তাবলী স্বয়ংক্রিয়ভাবে পূরণ করা হয়েছে।`
+      ));
+    }
+  }, [forecast, setValue, userDistrict, language]);
 
   const onSubmit = async (data: BatchFormValues) => {
     // Check if this is the first batch BEFORE adding it
