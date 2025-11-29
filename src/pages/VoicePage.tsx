@@ -132,10 +132,10 @@ const VoicePage = () => {
                   "• মাইক বাটনে চাপ দিন এবং বাংলায় প্রশ্ন করুন।"
                 )}
               </p>
-              <p className="text-xs text-blue-500 mt-1">
+              <p className="text-xs text-blue-500 mt-1 font-medium">
                 {getTranslation(
-                  "Press mic button and ask questions in Bangla. You'll get instant answers!",
-                  "উত্তর পেতে মাইকে চাপ দিন এবং বাংলায় প্রশ্ন করুন।"
+                  "Instantly identify the threat, assess the risk, and generate a hyper-local, grounded, and specific treatment plan entirely in Bangla.",
+                  "তাৎক্ষণিকভাবে হুমকি শনাক্ত করুন, ঝুঁকি মূল্যায়ন করুন এবং সম্পূর্ণ বাংলায় একটি হাইপার-লোকাল, বাস্তবসম্মত ও নির্দিষ্ট প্রতিকার পরিকল্পনা তৈরি করুন।"
                 )}
               </p>
             </div>
