@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSession } from "@/contexts/SessionContext";
-import { DailyForecast } from "@/data/weatherData";
+import { DailyForecast, WeatherAlert } from "@/data/weatherData";
 import { fetchWeather } from "@/utils/weather";
 
 interface WeatherHookResult {
     forecast: DailyForecast[];
+    alerts: WeatherAlert[];
     isLoading: boolean;
     error: Error | null;
     isStaleCache: boolean;
@@ -28,10 +29,11 @@ export const useWeather = (): WeatherHookResult => {
     gcTime: 86400000, // 24 hours
   });
   
-  const result = data || { data: [], isCached: false, isStale: false };
+  const result = data || { data: [], alerts: [], isCached: false, isStale: false };
 
   return {
     forecast: result.data,
+    alerts: result.alerts,
     isLoading: isLoading || isFetching,
     error: error as Error | null,
     isStaleCache: result.isStale,

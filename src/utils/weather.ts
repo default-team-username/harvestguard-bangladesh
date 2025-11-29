@@ -1,4 +1,4 @@
-import { DailyForecast } from "@/data/weatherData";
+import { DailyForecast, WeatherAlert } from "@/data/weatherData";
 import { format } from "date-fns";
 
 // Define the structure for the API response (simplified)
@@ -26,6 +26,7 @@ interface WeatherApiResponse {
 // Define the return type for the fetch function
 interface WeatherFetchResult {
     data: DailyForecast[];
+    alerts: WeatherAlert[];
     isCached: boolean;
     isStale: boolean;
 }
@@ -67,6 +68,73 @@ const getGuidance = (forecast: DailyForecast, lang: 'en' | 'bn'): { guidanceEn: 
 
   return { guidanceEn, guidanceBn };
 };
+
+// NEW FUNCTION: Generate custom alerts based on forecast data
+const generateCustomAlerts = (forecast: DailyForecast[], lang: 'en' | 'bn'): WeatherAlert[] => {
+  const alerts: WeatherAlert[] = [];
+  let alertId = 1;
+
+  // --- 1. URGENT: Heavy Rain Today (Rain >= 70% Today) ---
+  if (forecast.length > 0 && forecast[0].rainChance >= 70) {
+    alerts.push({
+      id: alertId++,
+      type: 'rain',
+      titleEn: 'URGENT: Heavy Rain Today',
+      titleBn: '⚠️ জরুরি: আজ ভারী বৃষ্টি',
+      detailEn: `Rain expected within 3 hours (${forecast[0].rainChance}%). Cover harvested paddy immediately.`,
+      detailBn: `আগামী ৩ ঘণ্টার মধ্যে বৃষ্টি শুরু হবে (${forecast[0].rainChance}%)। আজই ধান ঢেকে রাখুন।`,
+      actionEn: 'Take action now',
+      actionBn: '✓ এখনই ব্যবস্থা নিন',
+    });
+  }
+
+  // --- 2. Very Hot Today/Tomorrow (Temp >= 35°C) ---
+  let heatDayIndex = -1;
+  if (forecast.length > 0 && forecast[0].tempMax >= 35) {
+      heatDayIndex = 0;
+  } else if (forecast.length > 1 && forecast[1].tempMax >= 35) {
+      heatDayIndex = 1;
+  }
+
+  if (heatDayIndex !== -1) {
+    const dayLabelEn = heatDayIndex === 0 ? 'Today' : 'Tomorrow';
+    const dayLabelBn = heatDayIndex === 0 ? 'আজ' : 'কাল';
+    const tempMax = forecast[heatDayIndex].tempMax;
+
+    alerts.push({
+      id: alertId++,
+      type: 'heat',
+      titleEn: `Very Hot ${dayLabelEn}`,
+      titleBn: `🌡️ ${dayLabelBn} খুব গরম পড়বে`,
+      detailEn: `Temperature will rise to ${tempMax}°C. Avoid irrigation during noon. Irrigate in the afternoon.`,
+      detailBn: `তাপমাত্রা ${tempMax}°C উঠবে। দুপুরে সেচ দেবেন না। বিকেলের দিকে সেচ দিন।`,
+      actionEn: 'Irrigate in the afternoon',
+      actionBn: '✓ বিকেলে সেচ দিন',
+    });
+  }
+  
+  // --- 3. General Alert (3-Day Summary for Rain) ---
+  if (forecast.length >= 3) {
+    const rainyDays = forecast.slice(0, 3).filter(day => day.rainChance >= 70);
+    const rainyDaysCount = rainyDays.length;
+
+    if (rainyDaysCount >= 2) {
+      alerts.push({
+        id: alertId++,
+        type: 'general',
+        titleEn: 'Rain Coming in 3 Days',
+        titleBn: '☔ আগামী ৩ দিনে বৃষ্টি আসছে',
+        detailEn: `Heavy rain expected for ${rainyDaysCount} days (70%+). Harvest paddy before the rain starts.`,
+        detailBn: `${rainyDaysCount} দিন বৃষ্টি হবে (৭০%+)। বৃষ্টি শুরুর আগেই ধান কেটে ফেলুন।`,
+        actionEn: 'Harvest quickly',
+        actionBn: '✓ তাড়াতাড়ি কাটুন',
+      });
+    }
+  }
+
+  return alerts;
+};
+
 
 // Helper to map WeatherAPI response to DailyForecast structure
 const mapForecastToDailyForecast = (
@@ -158,8 +226,9 @@ export const fetchWeather = async (location: string, lang: 'en' | 'bn'): Promise
       }));
       
       if (!isStale) {
-        // Fresh cache hit
-        return { data: cachedResult.data, isCached: true, isStale: false };
+        // Fresh cache hit: regenerate alerts from cached forecast data
+        const cachedAlerts = generateCustomAlerts(cachedResult.data, lang);
+        return { data: cachedResult.data, alerts: cachedAlerts, isCached: true, isStale: false };
       }
     } catch (e) {
       console.error("Error parsing cached data:", e);
@@ -169,8 +238,8 @@ export const fetchWeather = async (location: string, lang: 'en' | 'bn'): Promise
   }
 
   // --- Attempt Network Fetch ---
-  // Simulating the serverless route logic here in the client
-  const apiUrl = `https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${location}&days=5&lang=${lang}`;
+  // Updated apiUrl to include alerts=yes and aqi=no
+  const apiUrl = `https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${location}&days=5&lang=${lang}&alerts=yes&aqi=no`;
 
   try {
     const response = await fetch(apiUrl);
@@ -184,6 +253,7 @@ export const fetchWeather = async (location: string, lang: 'en' | 'bn'): Promise
 
     const apiData: WeatherApiResponse = await response.json();
     const transformedData = transformApiData(apiData, lang);
+    const generatedAlerts = generateCustomAlerts(transformedData, lang);
 
     // Cache successful response
     localStorage.setItem(cacheKey, JSON.stringify({
@@ -191,15 +261,16 @@ export const fetchWeather = async (location: string, lang: 'en' | 'bn'): Promise
       data: transformedData,
     }));
 
-    return { data: transformedData, isCached: false, isStale: false };
+    return { data: transformedData, alerts: generatedAlerts, isCached: false, isStale: false };
 
   } catch (error) {
     console.error("Error fetching weather data:", error);
     
     // If network fails, return stale cache if available
     if (cachedResult) {
+        const cachedAlerts = generateCustomAlerts(cachedResult.data, lang);
         // Return stale cache data
-        return { data: cachedResult.data, isCached: true, isStale: true };
+        return { data: cachedResult.data, alerts: cachedAlerts, isCached: true, isStale: true };
     }
     
     // If no cache available, throw the required error message

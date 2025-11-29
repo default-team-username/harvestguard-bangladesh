@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 import BottomNavBar from '@/components/layout/BottomNavBar';
 import WeatherAlertCard from '@/components/weather/WeatherAlertCard';
 import DailyForecastDetail from '@/components/weather/DailyForecastDetail';
-import { mockAlerts, generalNote } from '@/data/weatherData';
+import { generalNote } from '@/data/weatherData';
 import { useWeather } from '@/hooks/useWeather';
 
 // Helper component for the Map Risk Indicator boxes
@@ -41,7 +41,7 @@ const WeatherPage = () => {
   const userDistrict = user?.user_metadata?.district || 'Dhaka';
 
   // --- Live Weather Data Integration ---
-  const { forecast, isLoading, error, isStaleCache } = useWeather();
+  const { forecast, alerts, isLoading, error, isStaleCache } = useWeather();
   // --- End Live Weather Data Integration ---
 
   // Mock data for map risk counts (remains untouched)
@@ -51,7 +51,7 @@ const WeatherPage = () => {
     { emoji: '🔴', labelEn: 'High', labelBn: 'উচ্চ', count: 3, colorClass: 'text-destructive' },
   ];
 
-  // --- Loading/Error/Stale Cache Handling ---
+  // --- Loading/Error/Stale Cache Handling for Forecast ---
   const renderForecastContent = () => {
     if (isLoading && forecast.length === 0) {
       return (
@@ -125,7 +125,59 @@ const WeatherPage = () => {
       </div>
     );
   };
-  // --- End Loading/Error/Stale Cache Handling ---
+  
+  // NEW: Render Alerts Content
+  const renderAlertsContent = () => {
+    if (isLoading && alerts.length === 0 && !error) {
+      // Show a loading state for alerts if nothing is cached yet
+      return (
+        <Card className="p-4 text-center bg-secondary/50 border-border/50 animate-pulse">
+          <p className="text-sm font-semibold text-primary">
+            {getTranslation("Loading alerts...", "সতর্কতা লোড হচ্ছে...")}
+          </p>
+        </Card>
+      );
+    }
+
+    if (error && alerts.length === 0) {
+      // Show specific error message if API failed and no cached alerts are available
+      return (
+        <Card className="w-full shadow-lg border-2 bg-red-50 border-red-400">
+          <CardContent className="p-4 space-y-3 text-center">
+            <AlertTriangle className="h-6 w-6 text-destructive mx-auto" />
+            <h3 className="text-base font-semibold text-destructive">
+              {getTranslation("Failed to load weather alerts.", "আবহাওয়ার সতর্কতা লোড করা যাচ্ছে না।")}
+            </h3>
+            <p className="text-xs text-destructive/80">
+              {getTranslation("Please check your internet connection.", "দয়া করে ইন্টারনেট সংযোগ চেক করুন।")}
+            </p>
+          </CardContent>
+        </Card>
+      );
+    }
+    
+    // If alerts are available (either fresh or cached)
+    if (alerts.length > 0) {
+        return alerts.map(alert => (
+            <WeatherAlertCard key={alert.id} alert={alert} />
+        ));
+    }
+    
+    // If no alerts are triggered by the forecast data
+    return (
+        <Card className="w-full shadow-lg border-2 bg-green-50 border-green-400">
+          <CardContent className="p-4 space-y-3 text-center">
+            <Cloud className="h-6 w-6 text-primary mx-auto" />
+            <h3 className="text-base font-semibold text-primary">
+              {getTranslation("All Clear", "সবকিছু নিরাপদ")}
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              {getTranslation("No immediate weather risks detected for your area.", "আপনার এলাকায় কোনো তাৎক্ষণিক আবহাওয়ার ঝুঁকি নেই।")}
+            </p>
+          </CardContent>
+        </Card>
+    );
+  };
 
 
   return (
@@ -178,9 +230,7 @@ const WeatherPage = () => {
           <h2 className="text-lg font-bold text-foreground">
             {getTranslation("Immediate Alerts", "তাৎক্ষণিক সতর্কতা")}
           </h2>
-          {mockAlerts.map(alert => (
-            <WeatherAlertCard key={alert.id} alert={alert} />
-          ))}
+          {renderAlertsContent()}
         </section>
 
         {/* 2. Map Preview Card (REMAINS UNTOUCHED) */}
