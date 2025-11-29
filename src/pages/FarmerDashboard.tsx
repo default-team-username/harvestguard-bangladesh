@@ -165,8 +165,8 @@ const FarmerDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Alerts Component (Example Usage) */}
-      <Alerts weather={{ weatherStatus: "good" }} risk={{ riskLevel: "Critical" }} />
+      {/* Alerts Component (Now fetches its own data) */}
+      <Alerts />
       
       {/* Main Container */}
       <div className="flex flex-col items-center pb-20 md:pb-0"> {/* Added pb-20 for bottom nav bar clearance */}

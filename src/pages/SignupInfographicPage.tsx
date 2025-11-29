@@ -17,7 +17,7 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { mockDb, type NewUserProfileData } from "@/lib/mockDb";
+import { mockDb } from "@/lib/mockDb";
 
 // --- Schema Definition ---
 const signupSchema = z.object({
@@ -61,7 +61,7 @@ const stepsData = [
 ];
 
 const districts = [
-  "Dhaka", "Chittagong", "Rajshahi", "Khulna", "Barisal", "Sylhet", "Rangpur", "Mymensingh", "Comilla", "Narayanganj"
+  "Dhaka", "Chittagong", "Rajshahi", "Khulna", "Barisal", "Sylhet", "Rangpur", "Mymensingh", "Comilla", "Narayganj"
 ];
 
 const SignupInfographicPage = () => {

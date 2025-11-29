@@ -2,46 +2,69 @@
 
 import React, { useEffect } from 'react';
 import { toast } from 'sonner';
+import { useBatch } from '@/contexts/BatchContext';
+import { useWeather } from '@/hooks/useWeather';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { generateSmartAlert } from '@/utils/gemini';
 
-interface WeatherProps {
-  weatherStatus: "good" | "bad";
-}
+const Alerts: React.FC = () => {
+  const { batches } = useBatch();
+  const { forecast, isLoading: isWeatherLoading } = useWeather();
+  const { language } = useLanguage();
 
-interface RiskProps {
-  riskLevel: "Critical" | "Low" | "Medium";
-}
-
-interface AlertsProps {
-  weather: WeatherProps;
-  risk: RiskProps;
-}
-
-const Alerts: React.FC<AlertsProps> = ({ weather, risk }) => {
-  // This useEffect hook runs once when the component mounts, triggering the notifications.
   useEffect(() => {
-    // 2. Weather Alerts
-    if (weather.weatherStatus === "bad") {
-      // If weather is "bad", show a UI toast: "মৌসম খারাপ"
-      toast.warning("মৌসম খারাপ", {
-        description: "Weather status is bad. Take precautions.",
-        duration: 5000,
-      });
-    } else if (weather.weatherStatus === "good") {
-      // If weather is "good", show a UI toast: "আগামীকাল বৃষ্টি হবে এবং আপনার আলু গুদামে আর্দ্রতা বেশি। এখনই ফ্যান চালু করুন।"
-      toast.success("আগামীকাল বৃষ্টি হবে এবং আপনার আলু গুদামে আর্দ্রতা বেশি। এখনই ফ্যান চালু করুন।", {
-        description: "Good weather, but check storage conditions.",
-        duration: 7000,
-      });
-    }
+    // Conditions to generate an alert:
+    // 1. Batches and weather data have loaded.
+    // 2. The user has at least one batch registered.
+    // 3. There is a forecast available for tomorrow.
+    if (!isWeatherLoading && batches.length > 0 && forecast.length > 1) {
+      const tomorrowWeather = forecast[1]; // Index 1 is tomorrow's forecast
 
-    // 3. Critical Risk Notification
-    if (risk.riskLevel === "Critical") {
-      // When the farm risk level is "Critical", simulate an SMS notification by printing to the console:
-      console.log("SMS Notification: আপনার ফার্মে ক্রিটিক্যাল ঝুঁকি শনাক্ত হয়েছে!");
-    }
-  }, [weather.weatherStatus, risk.riskLevel]);
+      // A self-invoking async function to call the Gemini utility
+      (async () => {
+        try {
+          const alert = await generateSmartAlert(batches, tomorrowWeather, language);
 
-  // The component itself renders nothing visible, it only handles side effects (toasts/console logs)
+          if (alert) {
+            // Display the toast based on the alert type from Gemini
+            switch (alert.type) {
+              case 'warning':
+                toast.warning(alert.message, {
+                  description: alert.description,
+                  duration: 8000, // Longer duration for important alerts
+                });
+                break;
+              case 'info':
+                toast.info(alert.message, {
+                  description: alert.description,
+                  duration: 6000,
+                });
+                break;
+              case 'success':
+                 toast.success(alert.message, {
+                  description: alert.description,
+                  duration: 6000,
+                });
+                break;
+              case 'error':
+                toast.error(alert.message, {
+                  description: alert.description,
+                  duration: 8000,
+                });
+                break;
+            }
+          }
+        } catch (error) {
+          console.error("Failed to generate smart alert:", error);
+          // Optionally, show a generic error toast to the user
+          // toast.error("Could not fetch smart alert.");
+        }
+      })();
+    }
+    // The dependency array ensures this effect runs only when the necessary data changes.
+  }, [batches, forecast, isWeatherLoading, language]);
+
+  // The component itself renders nothing visible, it only handles the toast side effect.
   return null;
 };
 
