@@ -196,7 +196,10 @@ const PredictionResultCard: React.FC<PredictionResultCardProps> = ({ result, dat
               </p>
             </div>
           </div>
-          <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold h-10 rounded-xl">
+          <Button 
+            onClick={() => navigate('/dashboard/quality-scan')} // Navigate to the new page
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold h-10 rounded-xl"
+          >
             {getTranslation("Upload Image", "ছবি আপলোড করুন")}
           </Button>
         </CardContent>
