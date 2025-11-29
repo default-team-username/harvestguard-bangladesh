@@ -154,8 +154,8 @@ const BatchRegistrationForm: React.FC<BatchRegistrationFormProps> = ({ onSubmit 
         <Input
           id="storageTemperature"
           type="number"
-          step="1"
-          placeholder={getTranslation("25", "২৫")}
+          step="0.1"
+          placeholder={getTranslation("25.5", "২৫.৫")}
           {...register('storageTemperature', { valueAsNumber: true })}
           className="bg-muted/50 h-12 rounded-xl"
         />
