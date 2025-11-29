@@ -55,8 +55,8 @@ const getDb = (): MockDatabase => {
     users: {},
     apiKeys: {
       weather: import.meta.env.VITE_WEATHER_API_KEY || 'YOUR_WEATHER_API_KEY',
-      gemini: 'AIzaSyB81dZ_Ww-SkyFX0Y19dX13C419Di0sqr0',
-      elevenlabs: 'sk_be42285ec9cd2f85a21527bf7ef2eac037916c502f8d6860',
+      gemini: import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyB81dZ_Ww-SkyFX0Y19dX13C419Di0sqr0',
+      elevenlabs: import.meta.env.VITE_ELEVENLABS_API_KEY || 'sk_be42285ec9cd2f85a21527bf7ef2eac037916c502f8d6860',
     },
   };
 };
