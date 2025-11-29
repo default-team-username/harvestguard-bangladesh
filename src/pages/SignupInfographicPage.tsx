@@ -17,7 +17,7 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-// import { supabase } from "@/integrations/supabase/client"; // Removed Supabase import
+import { MOCK_USER_DB_KEY, MockDbUser } from "@/contexts/SessionContext"; 
 
 // --- Schema Definition ---
 const signupSchema = z.object({
@@ -63,8 +63,6 @@ const stepsData = [
 const districts = [
   "Dhaka", "Chittagong", "Rajshahi", "Khulna", "Barisal", "Sylhet", "Rangpur", "Mymensingh", "Comilla", "Narayanganj"
 ];
-
-const MOCK_SIGNUP_CREDENTIALS_KEY = 'mock_signup_credentials';
 
 const SignupInfographicPage = () => {
   const navigate = useNavigate();
@@ -129,15 +127,39 @@ const SignupInfographicPage = () => {
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // --- Mock Persistence Logic ---
-    const mockUserData = {
-      mobile: data.mobile,
-      password: data.password,
-      name: data.name,
-      district: data.district,
-      role: 'farmer', // Signed up users are farmers
+    // --- Mock Persistence Logic: Save to MOCK_USER_DB_KEY array ---
+    const newUser: MockDbUser = {
+      id: Date.now().toString(),
+      email: `${data.mobile}@shekor.com`,
+      password: data.password, // Store password for mock login check
+      user_metadata: {
+        name: data.name,
+        district: data.district,
+        role: 'farmer',
+        nid: data.nid,
+        mobile: data.mobile,
+        farmSize: data.farmSize,
+      },
     };
-    localStorage.setItem(MOCK_SIGNUP_CREDENTIALS_KEY, JSON.stringify(mockUserData));
+
+    const storedDbString = localStorage.getItem(MOCK_USER_DB_KEY);
+    let userDb: MockDbUser[] = [];
+    if (storedDbString) {
+      try {
+        userDb = JSON.parse(storedDbString);
+      } catch (e) {
+        console.error("Failed to parse mock user database:", e);
+      }
+    }
+    
+    // Check for existing mobile number (simple uniqueness check)
+    if (userDb.some(u => u.user_metadata.mobile === data.mobile)) {
+        toast.error(getTranslation('Registration failed: Mobile number already registered.', 'নিবন্ধন ব্যর্থ: মোবাইল নম্বরটি ইতিমধ্যে নিবন্ধিত।'), { id: loadingToastId });
+        return;
+    }
+
+    userDb.push(newUser);
+    localStorage.setItem(MOCK_USER_DB_KEY, JSON.stringify(userDb));
     // --- End Mock Persistence Logic ---
 
     toast.success(getTranslation('Registration successful! You can now log in.', 'নিবন্ধন সফল! আপনি এখন লগইন করতে পারেন।'), { id: loadingToastId });

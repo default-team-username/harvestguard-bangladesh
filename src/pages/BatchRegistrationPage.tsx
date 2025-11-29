@@ -7,6 +7,7 @@ import { ArrowLeft, Wheat } from 'lucide-react';
 
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBatch } from '@/contexts/BatchContext';
+import { useSession } from '@/contexts/SessionContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -15,14 +16,20 @@ import PredictionResultCard from '@/components/batch/PredictionResultCard.tsx';
 import FirstBatchSuccessModal from '@/components/batch/FirstBatchSuccessModal';
 import { batchSchema, BatchFormValues, PredictionResult } from '@/data/batchData.ts';
 import { generateMockPrediction } from '@/utils/prediction.ts';
+import { getMockEnvironmentDefaults } from '@/utils/mockEnvironment';
 
 const BatchRegistrationPage = () => {
   const navigate = useNavigate();
   const { language } = useLanguage();
-  const { addBatch, batches } = useBatch(); // Get batches here to check length
+  const { addBatch, batches } = useBatch();
+  const { user } = useSession(); // Get user session
+  
   const [prediction, setPrediction] = useState<PredictionResult | null>(null);
   const [submittedData, setSubmittedData] = useState<BatchFormValues | null>(null);
   const [showFirstBatchModal, setShowFirstBatchModal] = useState(false);
+
+  const userDistrict = user?.user_metadata?.district || 'Dhaka';
+  const environmentDefaults = getMockEnvironmentDefaults(userDistrict);
 
   const formMethods = useForm<BatchFormValues>({
     resolver: zodResolver(batchSchema),
@@ -30,10 +37,11 @@ const BatchRegistrationPage = () => {
       cropType: '',
       estimatedWeight: 0,
       harvestDate: undefined,
-      storageLocation: '',
+      // Use user's location and mock environment data for defaults (Requirement 1)
+      storageLocation: userDistrict, 
       storageMethod: '',
-      storageTemperature: 25,
-      moistureLevel: 60,
+      storageTemperature: environmentDefaults.storageTemperature,
+      moistureLevel: environmentDefaults.moistureLevel,
     },
     mode: 'onChange',
   });

@@ -10,15 +10,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sprout, Phone, Lock, Wheat, ShoppingCart, Briefcase, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
-import { useSession } from '@/contexts/SessionContext';
+import { useSession, MOCK_USER_DB_KEY, MockUserProfile, MockDbUser } from '@/contexts/SessionContext';
 
 // --- Mock Credentials ---
 const MOCK_MOBILE = '01312345678';
 const MOCK_PASSWORD = 'asdfgh';
 const MOCK_USER_NAME = 'Shekhor';
 const MOCK_DISTRICT = 'Dhaka';
-
-const MOCK_SIGNUP_CREDENTIALS_KEY = 'mock_signup_credentials';
 
 // --- Schema Definition ---
 const loginSchema = z.object({
@@ -85,27 +83,27 @@ const LoginPage = () => {
     const loadingToastId = toast.loading(language === 'en' ? 'Signing In...' : 'সাইন ইন হচ্ছে...');
 
     let isAuthenticated = false;
-    let userDetails = null;
+    let userDetails: MockUserProfile | null = null;
 
-    // 1. Check against dynamically registered mock user (from signup page)
-    const storedCredentialsString = localStorage.getItem(MOCK_SIGNUP_CREDENTIALS_KEY);
-    if (storedCredentialsString) {
+    // 1. Check against dynamically registered mock users (from signup page)
+    const storedDbString = localStorage.getItem(MOCK_USER_DB_KEY);
+    if (storedDbString) {
       try {
-        const storedCredentials = JSON.parse(storedCredentialsString);
-        if (mobile === storedCredentials.mobile && password === storedCredentials.password && role === storedCredentials.role) {
+        const userDb: MockDbUser[] = JSON.parse(storedDbString);
+        const matchedUserWithPassword = userDb.find(u => 
+          u.user_metadata.mobile === mobile && 
+          u.user_metadata.role === role &&
+          u.password === password
+        );
+
+        if (matchedUserWithPassword) {
           isAuthenticated = true;
-          userDetails = {
-            id: 'mock-user-id-dynamic',
-            email: `${mobile}@shekor.com`,
-            user_metadata: {
-              name: storedCredentials.name,
-              district: storedCredentials.district,
-              role: storedCredentials.role,
-            }
-          };
+          // Destructure to remove password before setting userDetails
+          const { password: _, ...restUser } = matchedUserWithPassword;
+          userDetails = restUser as MockUserProfile;
         }
       } catch (e) {
-        console.error("Failed to parse stored mock credentials:", e);
+        console.error("Failed to parse stored mock user database:", e);
       }
     }
 
@@ -119,6 +117,9 @@ const LoginPage = () => {
           name: MOCK_USER_NAME,
           district: MOCK_DISTRICT,
           role: role, // Use the selected role for the hardcoded user
+          nid: '0000000000',
+          mobile: MOCK_MOBILE,
+          farmSize: 5,
         }
       };
     }

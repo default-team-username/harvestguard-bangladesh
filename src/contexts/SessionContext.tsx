@@ -2,44 +2,56 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { useNavigate } from 'react-router-dom';
 
 // --- Mock Types for Prototyping ---
-interface MockUser {
+export interface MockUserProfileMetadata {
+  name: string;
+  district: string;
+  role: 'farmer' | 'buyer' | 'executive';
+  nid: string;
+  mobile: string;
+  farmSize: number;
+  [key: string]: any;
+}
+
+export interface MockUserProfile {
   id: string;
   email: string;
-  user_metadata: {
-    name: string;
-    district: string;
-    role: string;
-    [key: string]: any;
-  };
+  user_metadata: MockUserProfileMetadata;
+}
+
+// Type used for storage in the mock database (includes password for mock login check)
+export interface MockDbUser extends MockUserProfile {
+    password?: string; 
 }
 
 interface MockSession {
-  user: MockUser;
+  user: MockUserProfile;
   access_token: string;
 }
 
 interface SessionContextType {
   session: MockSession | null;
-  user: MockUser | null;
+  user: MockUserProfile | null;
   isLoading: boolean;
-  mockLogin: (userData: MockUser) => void;
+  mockLogin: (userData: MockUserProfile) => void;
   mockLogout: () => void;
 }
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 const MOCK_SESSION_KEY = 'mock_session';
+export const MOCK_USER_DB_KEY = 'mock_user_database'; // NEW KEY for the dynamic user database
 
 export const SessionContextProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<MockSession | null>(null);
-  const [user, setUser] = useState<MockUser | null>(null);
+  const [user, setUser] = useState<MockUserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  const mockLogin = (userData: MockUser) => {
+  const mockLogin = (userData: MockUserProfile) => {
     const mockSession: MockSession = {
       user: userData,
       access_token: 'mock_token_123',
     };
+    // When storing the session, ensure we only store the clean MockUserProfile structure
     localStorage.setItem(MOCK_SESSION_KEY, JSON.stringify(mockSession));
     setSession(mockSession);
     setUser(userData);
